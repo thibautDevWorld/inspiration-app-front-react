@@ -1,21 +1,30 @@
 import { useState } from "react";
 import ResultCard from "./ResultCard";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const Add = () => {
   const [search, setSearch] = useState("");
   const [results, setResults] = useState([]);
   const [error, setError] = useState(null);
+  const { user } = useAuthContext();
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (!user) {
+      setError("You must be logged in");
+      return;
+    }
+
     const searchTerm = { search };
 
-    const response = await fetch("/api/book-create", {
+    const response = await fetch("/api/books/book-create", {
       method: "POST",
       body: JSON.stringify(searchTerm),
       headers: {
         "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
       },
     });
     const json = await response.json();
@@ -25,7 +34,9 @@ const Add = () => {
     }
     if (response.ok) {
       //call data to filter the search
-      const dataFromMongo = await fetch("/api");
+      const dataFromMongo = await fetch("/api/books", {
+        headers: { Authorization: `Bearer ${user.token}` },
+      });
       const dataFromMongoJson = await dataFromMongo.json();
 
       let ids = new Set(dataFromMongoJson.map(({ bookId }) => bookId));
@@ -37,37 +48,35 @@ const Add = () => {
     }
   };
 
+  
   return (
-    <div className="add-page">
+    <>
       <div className="container">
-        <div className="add-content">
-          <div className="input-wrapper">
-            <form className="search" onSubmit={handleSubmit}>
-              <input
-                type="text"
-                placeholder="Search for a book"
-                onChange={(e) => setSearch(e.target.value)}
-              />
-              <button>Search</button>
-            </form>
+        <form onSubmit={handleSubmit} className="add-content">
+          <input
+            type="text"
+            placeholder="Search for a book"
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <button className="nav-btn">Search</button>
+        </form>
 
-            {error && <div className="error">{error}</div>}
-
-            <div className="books">
-              {results.length > 0 && (
-                <ul className="results">
-                  {results.map((book) => (
-                    <li key={book.id}>
-                      <ResultCard book={book} />
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          </div>
-        </div>
+        {error && <div className="error">{error}</div>}
       </div>
-    </div>
+
+      <div className="result-search-container">
+        {results.length > 0 
+        && results.map((book) => (
+        
+          book.volumeInfo.title && (
+            <div key={book.id}>
+            <ResultCard  book={book} />
+          </div>
+          )
+        )
+        )}
+      </div>
+    </>
   );
 };
 

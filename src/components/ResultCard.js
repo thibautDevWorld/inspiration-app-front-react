@@ -1,30 +1,41 @@
 import { useState } from "react";
 import axios from "axios";
+import Modal from "./Modal";
+import { useAuthContext } from "../hooks/useAuthContext";
 
 const ResultCard = ({ book }) => {
-  const [error, setError] = useState(null);
   const [disableBtn, setdisableBtn] = useState(false);
+  const [show, setShow] = useState(false);
+  const { user } = useAuthContext();
+
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (!user) {
+      return;
+    }
 
     const bookSelected = {
       bookId: book.id,
       title: book.volumeInfo.title,
       authors: book.volumeInfo.authors,
       cover: book.volumeInfo.imageLinks.thumbnail,
+      description: book.volumeInfo.description
     };
 
     axios
-      .get("/api")
+      .get("/api/books", { headers: { Authorization: `Bearer ${user.token}` } })
       .then((res) => res.data)
       .then((res) => {
         let storedBook = res.find((o) => o.bookId === bookSelected.bookId);
         const addDisabled = storedBook ? true : false;
-        
+
         if (!addDisabled) {
           axios
-            .post("/api", bookSelected)
+            .post("/api/books", bookSelected, {
+              headers: { Authorization: `Bearer ${user.token}` },
+            })
             .then((response) => {
               setdisableBtn(true);
             })
@@ -35,30 +46,55 @@ const ResultCard = ({ book }) => {
 
   let thumbnail =
     book.volumeInfo.imageLinks && book.volumeInfo.imageLinks.thumbnail;
-  let amount = book.saleInfo.listPrice && book.saleInfo.listPrice.amount;
+
+  let authorsTab = book.volumeInfo.authors
+
 
   if (thumbnail !== undefined) {
     return (
       <>
-        <div className="result-card">
-          <div className="poster-wrapper">
-            <img src={thumbnail} alt="" />
+        <section className="result-card">
+          <div>
+            <img
+              className="result-image"
+              src={thumbnail}
+              alt={book.volumeInfo.title}
+            />
+            
           </div>
-          <div className="info">
-            <div className="header">
-              <h4 className="title">{book.volumeInfo.title}</h4>
-              <p>{book.volumeInfo.author}</p>
-              <p className="amount">{amount}</p>
+          <div className="result-authors-contain">
+            <h1>{book.volumeInfo.title}</h1>
+            <div className="book-authors">
+             {authorsTab && authorsTab.map((author, idx) => (
+              <p key={idx}>{author}</p>
+             ))}
+             <div className="button-detail-card-area">
               <button
-                className="btn"
-                onClick={handleSubmit}
-                disabled={disableBtn}
+              className="details-search-card"
+                onClick={() => {
+                  setShow(true);
+                }}
               >
-                Add to Watchlist
+                show details
               </button>
+              <br />
+              <button
+              className="add-watchlist-btn"
+              onClick={handleSubmit}
+              disabled={disableBtn}
+            >
+              Add to Watchlist
+            </button>
             </div>
           </div>
-        </div>
+          </div>
+          <div className="add-watchlist-content">
+            
+          </div>
+          <Modal show={show} item={book} onClose={() => setShow(false)} />
+        </section>
+
+       
       </>
     );
   }

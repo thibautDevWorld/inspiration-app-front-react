@@ -1,6 +1,7 @@
 import { FaTimes } from "react-icons/fa"
 
-const BookDetails = ({show, item, onClose}) => {
+const Modal = ({show, item, onClose}) => {
+ 
     if (!show) {
         return null;
     }
@@ -12,11 +13,11 @@ const BookDetails = ({show, item, onClose}) => {
                     <FaTimes />
                 </button>
                     <div className="inner-box">
-                        <img src={item.cover} alt={item.title} />
+                        <img src={item.volumeInfo.imageLinks.thumbnail} alt={item.volumeInfo.title} />
                         <div className="info">
-                            <h1>{item.title}</h1>
-                            <div>{item.authors.map((author, idx) => (<h4 key={idx}>{author}</h4>))}</div>
-                            <p>{item.description}</p>
+                            <h1>{item.volumeInfo.title}</h1>
+                            <div>{item.volumeInfo.authors && item.volumeInfo.authors.map((author, idx)=> (<h4 key={idx}>{author}</h4>))}</div>
+                            <p>{item.volumeInfo.description && item.volumeInfo.description}</p>
                         </div>
                     </div>
                 </div>
@@ -24,7 +25,5 @@ const BookDetails = ({show, item, onClose}) => {
         </>
      );
 }
-
-
-export default BookDetails
-
+ 
+export default Modal;
