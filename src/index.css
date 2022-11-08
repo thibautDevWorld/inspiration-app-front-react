@@ -328,16 +328,13 @@ input.error {
   cursor: pointer;
 }
 
-button:disabled {
+.button-detail-card-area button:disabled {
   background-color: var(--secondary);
   color: var(--ternary);
   opacity: 0.1;
   cursor: not-allowed;
 }
 
-/* .book-authors h3 {
-  font-size: 1rem;
-} */
 
 /* auth forms */
 form.signup, form.login {
