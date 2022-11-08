@@ -25,7 +25,7 @@ const ResultCard = ({ book }) => {
     };
 
     axios
-      .get("/api/books", { headers: { Authorization: `Bearer ${user.token}` } })
+      .get(`${process.env.REACT_APP_API_URL}/api/books`, { headers: { Authorization: `Bearer ${user.token}` } })
       .then((res) => res.data)
       .then((res) => {
         let storedBook = res.find((o) => o.bookId === bookSelected.bookId);
@@ -33,7 +33,7 @@ const ResultCard = ({ book }) => {
 
         if (!addDisabled) {
           axios
-            .post("/api/books", bookSelected, {
+            .post(`${process.env.REACT_APP_API_URL}/api/books`, bookSelected, {
               headers: { Authorization: `Bearer ${user.token}` },
             })
             .then((response) => {

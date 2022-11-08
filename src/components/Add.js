@@ -19,7 +19,7 @@ const Add = () => {
 
     const searchTerm = { search };
 
-    const response = await fetch("/api/books/book-create", {
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/api/books/book-create`, {
       method: "POST",
       body: JSON.stringify(searchTerm),
       headers: {
@@ -34,7 +34,7 @@ const Add = () => {
     }
     if (response.ok) {
       //call data to filter the search
-      const dataFromMongo = await fetch("/api/books", {
+      const dataFromMongo = await fetch(`${process.env.REACT_APP_API_URL}/api/books`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
       const dataFromMongoJson = await dataFromMongo.json();

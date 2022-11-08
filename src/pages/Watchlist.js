@@ -10,7 +10,7 @@ const Watchlist = () => {
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const response = await fetch("/api/books", {
+      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/books`, {
         headers: { Authorization: `Bearer ${user.token}` },
       });
 
@@ -32,13 +32,13 @@ const Watchlist = () => {
     }
 
     axios
-      .delete("/api/books/" + id, {
+      .delete(`${process.env.REACT_APP_API_URL}/api/books/` + id , {
         headers: { Authorization: `Bearer ${user.token}` },
       })
       .then((res) => {
         if (res.data) {
           axios
-            .get("/api/books", {
+            .get(`${process.env.REACT_APP_API_URL}/api/books`, {
               headers: { Authorization: `Bearer ${user.token}` },
             })
             .then((res) => setBooks(res.data));
